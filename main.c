@@ -2,59 +2,45 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define R_MAX 65535
-#define N 100000000 // Liczba punktów
-
-
-void firstAttempt() {
-    int Rn = 432; // Początkowa wartość Rn
-    int Rn1; // Następna wartość Rn
-    int k = 0; // Liczba trafień we wnętrze koła
-
-    // Generowanie N punktów
-    for (int i = 0; i < N; i++) {
-        Rn1 = 75 * (Rn + 1) % 65537 - 1;
-        double x = (double) Rn / (R_MAX + 1.0);
-        Rn = Rn1;
-
-        Rn1 = 75 * (Rn + 1) % 65537 - 1;
-        double y = (double) Rn / (R_MAX + 1.0);
-        Rn = Rn1;
-
-        if (x * x + y * y < 1) {
-            k++;
-        }
-    }
-
-    double pi = 4.0 * (double) k / (double) N;
-    printf("Przybliżona wartość liczby pi: %lf\n", pi);
-
-    double uncertainty = sqrt(((double) k * (double) (N - k)) / ((double) N * (double) N));
-    printf("Niepewność przybliżenia: %lf\n", uncertainty);
-}
-
-void secondAttempt() {
-    int seed = 432;
-    int k = 0;
-
-    srand(seed);
-
-    for (int i = 0; i < N; i++) {
-        double x = (double) rand() / (double) RAND_MAX;
-        double y = (double) rand() / (double) RAND_MAX;
-        if (x * x + y * y < 1) {
-            k++;
-        }
-    }
-    double pi = 4.0 * (double) k / (double) N;
-    printf("Przybliżona wartość liczby pi: %lf\n", pi);
-
-    double uncertainty = sqrt(((double) k * (double) (N - k)) / ((double) N * (double) N));
-    printf("Niepewność przybliżenia: %lf\n", uncertainty);
+double getRandom1(int *k) {
+    *k = ((75 * (*k + 45)) % 65537) - 1;
+    return (double) *k / (pow(2, 16) + 1.0);
 
 }
 
-int main(void) {
-    firstAttempt();
-    secondAttempt();
+double getRandom2() {
+
+    return (double) (rand() / (RAND_MAX + 1.0));
+
+}
+
+int main(int argc, char const *argv[]) {
+    int hit = 0;
+
+    int p = 1000;
+    if (argc > 1) {
+        p = atoi(argv[1]);
+    }
+
+    double r1, r2;
+    int i = 0;
+
+    int randint = 6543;
+    int *n;
+    n = &randint;
+
+    for (i; i < 2 * p; i += 2) {
+
+        r1 = getRandom2(n);
+        r2 = getRandom2(n);
+
+        if ((r1 * r1) + (r2 * r2) < 1) {
+            hit += 1;
+        }
+    }
+    printf("Liczba trafien: %d na %d prob \n", hit, p);
+    double pi = 4 * (double) hit / p;
+    printf("%f \n", pi);
+
+    return 0;
 }
